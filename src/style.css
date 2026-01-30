@@ -1,0 +1,19 @@
+:root[data-theme='dark'] {
+  --app-bg: #0b141a;
+  --chat-bg: #111b21;
+  --sent-bg: #005c4b;
+  --received-bg: #202c33;
+  --text-color: #f8f9fa;
+}
+
+:root[data-theme='light'] {
+  --app-bg: #f0f2f5;
+  --chat-bg: #efeae2;
+  --sent-bg: #d9fdd3;
+  --received-bg: #ffffff;
+  --text-color: #111;
+}
+
+:root {
+  --font-family: Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
