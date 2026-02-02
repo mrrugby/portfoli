@@ -9,11 +9,36 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import ChatHeader from './components/ChatHeader.vue'
 import ChatMessages from './components/ChatMessages.vue'
 import ChatInput from './components/ChatInput.vue'
 import sentSound from './assets/sentmessage.mp3'
+
+
+function scrollToBottom() {
+  const container = document.querySelector('.chat-messages')
+  if (container) {
+    container.scrollTop = container.scrollHeight
+  }
+}
+
+let resizeObserver
+
+onMounted(() => {
+  // scroll to bottom initially
+  scrollToBottom()
+
+  // Detect viewport height changes (keyboard open/close)
+  resizeObserver = new ResizeObserver(() => {
+    scrollToBottom()
+  })
+  resizeObserver.observe(document.documentElement)
+})
+
+onBeforeUnmount(() => {
+  if (resizeObserver) resizeObserver.disconnect()
+})
 
 // -------------------- HELPERS FIRST (avoid hoist bugs) --------------------
 function getTime() {
