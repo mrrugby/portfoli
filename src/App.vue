@@ -460,7 +460,7 @@ body, input, textarea, button, * { font-family: var(--font-family); }
  background: var(--app-bg);
  display: flex;
  justify-content: center;
- align-items: center;
+ align-items: stretch;
 }
 
 .chat-shell {
@@ -473,7 +473,7 @@ body, input, textarea, button, * { font-family: var(--font-family); }
 
 @media (min-width: 992px) {
   .chat-shell {
-    height: 100dvh;
+    height: 90dvh;
     border-radius: 12px;
     overflow: hidden;
   }
