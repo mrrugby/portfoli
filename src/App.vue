@@ -1,5 +1,8 @@
 <template>
-  <div class="app chat-contaniner">
+  <div
+  class="app chat-container"
+  :style="{ height: appHeight + 'px' }"
+>
     <div class="chat-shell shadow-lg">
       <ChatHeader ref="headerRef" @toggle-theme="toggleTheme" />
       <ChatMessages :messages="messages" @send="sendMessage":inputHeight="chatInput?.$el?.offsetHeight"/>
@@ -9,36 +12,32 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, watch } from 'vue'
 import ChatHeader from './components/ChatHeader.vue'
 import ChatMessages from './components/ChatMessages.vue'
 import ChatInput from './components/ChatInput.vue'
 import sentSound from './assets/sentmessage.mp3'
 
+const appHeight = ref(window.innerHeight)
 
-function scrollToBottom() {
-  const container = document.querySelector('.chat-messages')
-  if (container) {
-    container.scrollTop = container.scrollHeight
-  }
+function updateHeight() {
+  appHeight.value = window.visualViewport
+    ? window.visualViewport.height
+    : window.innerHeight
 }
 
-let resizeObserver
-
 onMounted(() => {
-  // scroll to bottom initially
-  scrollToBottom()
-
-  // Detect viewport height changes (keyboard open/close)
-  resizeObserver = new ResizeObserver(() => {
-    scrollToBottom()
-  })
-  resizeObserver.observe(document.documentElement)
+  updateHeight()
+  window.visualViewport?.addEventListener('resize', updateHeight)
+  window.addEventListener('resize', updateHeight)
 })
 
 onBeforeUnmount(() => {
-  if (resizeObserver) resizeObserver.disconnect()
+  window.visualViewport?.removeEventListener('resize', updateHeight)
+  window.removeEventListener('resize', updateHeight)
 })
+
+
 
 // -------------------- HELPERS FIRST (avoid hoist bugs) --------------------
 function getTime() {
@@ -483,8 +482,6 @@ body, input, textarea, button, * { font-family: var(--font-family); }
 html, body {
   height: 100%;
   margin: 0;
-  padding: 0;
-  overflow: hidden; 
 }
 .app{
  height:100svh;

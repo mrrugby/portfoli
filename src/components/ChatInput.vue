@@ -46,7 +46,7 @@ function submit() {
 
 <style scoped>
 .chat-input {
-  position: sticky;
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -54,6 +54,7 @@ function submit() {
   flex-shrink: 0;
   background: var(--header-bg);
   border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* input field */
