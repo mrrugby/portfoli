@@ -50,6 +50,7 @@ function submit() {
   align-items: center;
   gap: 10px;
   padding: 10px;
+  flex-shrink: 0;
   background: var(--header-bg);
   border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
@@ -57,7 +58,7 @@ function submit() {
 /* input field */
 .chat-text {
   flex: 1;
-  border: none;
+  border: 1px solid #ccc;
   outline: none;
   padding: 10px 14px;
   border-radius: 20px;

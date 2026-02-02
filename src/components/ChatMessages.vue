@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="chat-messages p-3">
+  <div ref="container" class="chat-messages">
     <div
       v-for="msg in messages"
       :key="msg.id"
@@ -7,7 +7,7 @@
       :class="[msg.from, { typing: msg.typing }]"
     >
       <div class="bubble">
-        
+
         <!-- Typing bubble -->
         <div v-if="msg.typing" class="typing-bubble">
           <span></span><span></span><span></span>
@@ -17,19 +17,13 @@
         <template v-else>
           <span class="text" v-html="msg.text"></span>
 
-          <!-- ✅ QUICK REPLY BUTTONS -->
-          <!-- QUICK REPLY BUTTONS -->
-          <div
-            v-if="msg.buttons && msg.buttons.length"
-            class="quick-buttons"
-          >
+          <div v-if="msg.buttons && msg.buttons.length" class="quick-buttons">
             <div v-for="(btn, i) in msg.buttons" :key="i" class="quick-btn-row">
               <button class="quick-btn" @click="$emit('send', btn)">
                 {{ btn }}
               </button>
             </div>
           </div>
-
 
           <small class="time">
             {{ msg.time }}
@@ -44,11 +38,8 @@
   </div>
 </template>
 
-
 <script setup>
-import { watch, ref, nextTick } from 'vue'
-
-defineEmits(['send'])
+import { ref, watch, nextTick } from 'vue'
 
 const props = defineProps({
   messages: Array
@@ -56,20 +47,28 @@ const props = defineProps({
 
 const container = ref(null)
 
-watch(() => props.messages.length, async () => {
-  await nextTick()
-  container.value.scrollTop = container.value.scrollHeight
-})
+// scroll to bottom whenever messages change
+watch(
+  () => props.messages,
+  async () => {
+    await nextTick() // wait for DOM update
+    if (container.value) {
+      container.value.scrollTop = container.value.scrollHeight
+    }
+  },
+  { deep: true }
+)
 </script>
-
 
 <style scoped>
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  background: var(--chat-bg);
+  display: flex;
+  flex-direction: column;
   padding: 12px;
-  scrollbar-width: none;
+  background: var(--chat-bg);
+  scroll-behavior: smooth;
 }
 
 /* message row */
@@ -90,16 +89,19 @@ watch(() => props.messages.length, async () => {
 
 /* bubble base */
 .bubble {
-font-family: var(--font-family);
+  font-family: var(--font-family);
   max-width: 72%;
+  width: fit-content;
   padding: 10px 14px;
   border-radius: 18px;
   font-size: 0.95rem;
   line-height: 1.4;
   position: relative;
   word-wrap: break-word;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  overflow-wrap: break-word;
   color: var(--text-color);
+  background: var(--received-bg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
 /* sent bubble */
@@ -117,6 +119,9 @@ font-family: var(--font-family);
 /* message text */
 .text {
   display: block;
+  white-space: pre-wrap;  /* allows wrapping and preserves line breaks */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* time + ticks wrapper */
@@ -139,14 +144,8 @@ font-family: var(--font-family);
 
 /* subtle pop animation */
 @keyframes popIn {
-  from {
-    transform: scale(0.96);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 /* typing bubble */
@@ -154,14 +153,12 @@ font-family: var(--font-family);
   padding: 10px 14px;
 }
 
-/* dots container */
 .typing-bubble {
   display: inline-flex;
   gap: 6px;
   align-items: center;
 }
 
-/* dots */
 .typing-bubble span {
   width: 6px;
   height: 6px;
@@ -170,13 +167,8 @@ font-family: var(--font-family);
   animation: typingBlink 1.4s infinite both;
 }
 
-.typing-bubble span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.typing-bubble span:nth-child(3) {
-  animation-delay: 0.4s;
-}
+.typing-bubble span:nth-child(2) { animation-delay: 0.2s; }
+.typing-bubble span:nth-child(3) { animation-delay: 0.4s; }
 
 @keyframes typingBlink {
   0% { opacity: 0.2; }
@@ -185,7 +177,6 @@ font-family: var(--font-family);
 }
 
 /* QUICK REPLY BUTTONS */
-
 .quick-buttons {
   margin-top: 8px;
   display: flex;
@@ -201,16 +192,9 @@ font-family: var(--font-family);
   border-radius: 16px;
   cursor: pointer;
   font-size: 13px;
-  text-align: left; /* optional */
+  text-align: left;
   transition: background 0.15s ease;
 }
 
-
-.quick-btn:hover {
-  background: #d8dbdd;
-}
-
-
-
-
+.quick-btn:hover { background: #d8dbdd; }
 </style>

@@ -1,9 +1,9 @@
 <template>
-  <div class="app">
+  <div class="app chat-contaniner">
     <div class="chat-shell shadow-lg">
       <ChatHeader ref="headerRef" @toggle-theme="toggleTheme" />
-      <ChatMessages :messages="messages" @send="sendMessage" />
-      <ChatInput @send="sendMessage"/>
+      <ChatMessages :messages="messages" @send="sendMessage":inputHeight="chatInput?.$el?.offsetHeight"/>
+      <ChatInput ref="chatInput" @send="sendMessage"/>
     </div>
   </div>
 </template>
@@ -280,7 +280,7 @@ function respond(input) {
   const lastUserMsg = [...messages.value].reverse().find(m => m.from === 'me')
   if (lastUserMsg) lastUserMsg.status = 'read'
 
-  
+
   const key = input.toLowerCase().trim()
 
 
@@ -372,5 +372,9 @@ body, input, textarea, button, * { font-family: var(--font-family); }
   }
 }
 
-.bold{ font-weight: 600; }
+.bold{ 
+  font-weight: 600; 
+  
+  }
+
 </style>
