@@ -62,6 +62,7 @@ watch(
 
 <style scoped>
 .chat-messages {
+  min-height: 0;
   flex: 1;
   overflow-y: auto;
   overscroll-behavior: contain;
