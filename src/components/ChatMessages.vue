@@ -68,7 +68,7 @@ watch(
   overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
-  padding: 12px;
+  padding: 12px 12px 80px;
   background: var(--chat-bg);
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
