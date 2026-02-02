@@ -70,7 +70,9 @@ watch(
   padding: 12px;
   background: var(--chat-bg);
   scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
+
 
 /* message row */
 .message {

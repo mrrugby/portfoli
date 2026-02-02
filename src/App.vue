@@ -456,19 +456,20 @@ function toggleTheme() {
 body, input, textarea, button, * { font-family: var(--font-family); }
 
 .app{
- min-height:100vh;
+ height:100vh;
  background: var(--app-bg);
  display: flex;
- justify-content: center;
  align-items: stretch;
 }
 
 .chat-shell {
-  width: 100%;
-  max-width: 1500px;
-  height: 100dvh;
+  flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  background: var(--chat-bg);
 }
 
 @media (min-width: 992px) {

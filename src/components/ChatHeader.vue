@@ -45,6 +45,7 @@
   align-items: center;
   padding: 0 1rem;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
 .avatar {
