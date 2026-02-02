@@ -31,9 +31,9 @@ document.documentElement.setAttribute('data-theme', theme.value)
 const messages = ref(
   savedMessages ? JSON.parse(savedMessages) : [{
     id: Date.now(),
-    text: `👋 Hello! Welcome to my portfolio.<br><br>
-           I’m <span class="bold">Shaka Senaji</span>, an ICT Officer & Systems Support Specialist.<br>
-           Type <span class="bold">'help'</span> to explore my experience.`,
+    text: `👋 Hello! Welcome to my portfolio.
+I’m <span class="bold">Shaka Senaji</span>, an ICT Officer & Systems Support Specialist.
+Type <span class="bold">'help'</span> to explore....`,
     from: 'bot',
     time: getTime()
   }]
@@ -230,11 +230,11 @@ function handleFlow(input) {
       data.contact = msg
       flow.step = 'confirm'
       pushBot(`✅ Confirm:<br>
-        <strong>Name:</strong> ${data.name}
-        <strong>Website:</strong> ${data.type}
-        <strong>Budget:</strong> ${data.budget}
-        <strong>Contact:</strong> ${data.contact}<br>
-        Type <strong>yes</strong> to confirm.`)
+<strong>Name:</strong> ${data.name}
+<strong>Website:</strong> ${data.type}
+<strong>Budget:</strong> ${data.budget}
+<strong>Contact:</strong> ${data.contact}<br>
+Type <strong>yes</strong> to confirm.`)
       return true
     }
 
@@ -341,7 +341,7 @@ const commands = {
 • Python & Django – eMobilis<br><br>
 
 <span class="bold">Focus:</span><br>
-Systems support, networking, databases & web platforms`
+Systems support, networking, databases & web platforms, django, Python`
 ),
 
 'about me': () => pushBot(
