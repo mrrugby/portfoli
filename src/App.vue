@@ -466,7 +466,7 @@ body, input, textarea, button, * { font-family: var(--font-family); }
 .chat-shell {
   width: 100%;
   max-width: 1500px;
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
 }

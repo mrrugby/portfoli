@@ -17,3 +17,8 @@
 :root {
   --font-family: 'Comfortaa';
 }
+
+body{
+  height: 100%;
+  overflow: hidden;
+}
