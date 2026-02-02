@@ -1,13 +1,11 @@
 <template>
   <div class="chat-header d-flex align-items-center px-3 shadow-sm">
-    <!-- Avatar -->
     <img src="../assets/image.png" class="avatar" alt="profile-pic" @click="showAvatarModal = true">
 
-    <!-- User info -->
     <div class="user-info flex-grow-1 ms-2">
       <div class="username" @click="showDetailsModal = true">Shaka Senaji</div>
       <div class="status">
-        <span v-if="status === 'typing'">
+        <span v-if="status === 'typing..'">
           typing<span class="dots"><span>.</span><span>.</span><span>.</span></span>
         </span>
         <span v-else>
@@ -16,24 +14,21 @@
       </div>
     </div>
 
-    <!-- Theme toggle button -->
     <button class="btn btn-theme-toggle" @click="toggleTheme" title="Toggle Theme">
       🌗
     </button>
 
-    <!-- Avatar Modal -->
     <div v-if="showAvatarModal" class="modal-overlay" @click.self="showAvatarModal = false">
       <img src="../assets/image.png" class="modal-avatar" />
     </div>
 
-    <!-- Details Modal -->
     <div v-if="showDetailsModal" class="modal-overlay" @click.self="showDetailsModal = false">
       <div class="modal-content">
         <h3>Shaka Senaji</h3>
         <p>ICT Officer & Systems Support Specialist</p>
         <p>Email: <strong>snjishaka@gmail.com</strong></p>
         <p>Phone: <strong>+254 704 210 555</strong></p>
-        <p>Portfolio: <a href="https://shakasenaji.vercel.app" target="_blank">shakasenaji.vercel.app</a></p>
+        <p>The site is still being built, Make sure to check in to see how features are updated.! </p>
       </div>
     </div>
   </div>

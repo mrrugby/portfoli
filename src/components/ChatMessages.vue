@@ -1,24 +1,54 @@
 <template>
   <div ref="container" class="chat-messages p-3">
-    <div v-for="msg in messages" :key="msg.id" class="message" :class="msg.from">
+    <div
+      v-for="msg in messages"
+      :key="msg.id"
+      class="message"
+      :class="[msg.from, { typing: msg.typing }]"
+    >
       <div class="bubble">
-        <span class="text" v-html="msg.text"></span>
-        <small class="time">
-        {{ msg.time }}
-        <span v-if="msg.from === 'me'" class="ticks">
-        {{ msg.status === 'read' ? '✔✔' : '✔' }}
-  </span>
-</small>
+        
+        <!-- Typing bubble -->
+        <div v-if="msg.typing" class="typing-bubble">
+          <span></span><span></span><span></span>
+        </div>
 
-      
+        <!-- Normal message -->
+        <template v-else>
+          <span class="text" v-html="msg.text"></span>
+
+          <!-- ✅ QUICK REPLY BUTTONS -->
+          <!-- QUICK REPLY BUTTONS -->
+          <div
+            v-if="msg.buttons && msg.buttons.length"
+            class="quick-buttons"
+          >
+            <div v-for="(btn, i) in msg.buttons" :key="i" class="quick-btn-row">
+              <button class="quick-btn" @click="$emit('send', btn)">
+                {{ btn }}
+              </button>
+            </div>
+          </div>
+
+
+          <small class="time">
+            {{ msg.time }}
+            <span v-if="msg.from === 'me'" class="ticks">
+              {{ msg.status === 'read' ? '✔✔' : '✔' }}
+            </span>
+          </small>
+        </template>
+
       </div>
-      
     </div>
   </div>
 </template>
 
+
 <script setup>
 import { watch, ref, nextTick } from 'vue'
+
+defineEmits(['send'])
 
 const props = defineProps({
   messages: Array
@@ -104,7 +134,7 @@ font-family: var(--font-family);
 /* ticks */
 .ticks {
   font-size: 0.65rem;
-  color: #53bdeb; /* WhatsApp blue */
+  color: #53bdeb;
 }
 
 /* subtle pop animation */
@@ -118,5 +148,69 @@ font-family: var(--font-family);
     opacity: 1;
   }
 }
+
+/* typing bubble */
+.typing .bubble {
+  padding: 10px 14px;
+}
+
+/* dots container */
+.typing-bubble {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* dots */
+.typing-bubble span {
+  width: 6px;
+  height: 6px;
+  background: #999;
+  border-radius: 50%;
+  animation: typingBlink 1.4s infinite both;
+}
+
+.typing-bubble span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-bubble span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingBlink {
+  0% { opacity: 0.2; }
+  20% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+
+/* QUICK REPLY BUTTONS */
+
+.quick-buttons {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.quick-btn {
+  width: 100%;
+  background: #e9edef;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left; /* optional */
+  transition: background 0.15s ease;
+}
+
+
+.quick-btn:hover {
+  background: #d8dbdd;
+}
+
+
+
 
 </style>

@@ -34,7 +34,6 @@ import { ref, computed, watch } from 'vue'
 const emit = defineEmits(['send'])
 const text = ref('')
 
-// computed to detect typing
 const isTyping = computed(() => text.value.trim().length > 0)
 
 function submit() {
@@ -78,7 +77,7 @@ function submit() {
   height: 40px;
   border-radius: 50%;
   border: none;
-  background: #25d366; /* WhatsApp green */
+  background: #25d366; 
   color: #fff;
   font-size: 1rem;
   cursor: pointer;
