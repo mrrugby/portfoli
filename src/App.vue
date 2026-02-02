@@ -455,8 +455,14 @@ function toggleTheme() {
 <style>
 body, input, textarea, button, * { font-family: var(--font-family); }
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; 
+}
 .app{
- height:100vh;
+ height:100svh;
  background: var(--app-bg);
  display: flex;
  align-items: stretch;
@@ -470,6 +476,7 @@ body, input, textarea, button, * { font-family: var(--font-family); }
   max-width: 1500px;
   margin: 0 auto;
   background: var(--chat-bg);
+  overflow: hidden;
 }
 
 @media (min-width: 992px) {

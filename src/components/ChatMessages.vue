@@ -51,7 +51,7 @@ const container = ref(null)
 watch(
   () => props.messages,
   async () => {
-    await nextTick() // wait for DOM update
+    await nextTick()
     if (container.value) {
       container.value.scrollTop = container.value.scrollHeight
     }
