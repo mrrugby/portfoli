@@ -473,7 +473,7 @@ body, input, textarea, button, * { font-family: var(--font-family); }
 
 @media (min-width: 992px) {
   .chat-shell {
-    height: 90vh;
+    height: 100dvh;
     border-radius: 12px;
     overflow: hidden;
   }
