@@ -499,8 +499,13 @@ html, body {
   height: 100%;
   max-width: 1500px;
   margin: 0 auto;
-  background: var(--chat-bg);
   overflow: hidden;
+
+  
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 @media (min-width: 992px) {

@@ -18,3 +18,27 @@
   --font-family: 'Comfortaa';
 }
 
+
+
+:root{
+  --chat-wallpaper: url('./assets/wallpapers/chat-bg-mobile.webp')
+}
+
+[data-theme='dark']{
+  --chat-wallpaper: url('./assets/wallpapers/chat-bg-mobile-dark.webp');
+}
+
+/* Desktop – Light */
+@media (min-width: 992px) {
+  :root {
+    --chat-wallpaper: url("./assets/wallpapers/desktop-light.jpg");
+  }
+}
+/* Desktop – Dark */
+@media (min-width: 992px) {
+  [data-theme="dark"] {
+    --chat-wallpaper: url("./assets/wallpapers/desktop-dark.jpg");
+  }
+}
+
+

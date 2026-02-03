@@ -1,42 +1,41 @@
 <template>
-  <div ref="container" class="chat-messages">
-    <div
-      v-for="msg in messages"
-      :key="msg.id"
-      class="message"
-      :class="[msg.from, { typing: msg.typing }]"
-    >
-      <div class="bubble">
-
-        <!-- Typing bubble -->
-        <div v-if="msg.typing" class="typing-bubble">
-          <span></span><span></span><span></span>
-        </div>
-
-        <!-- Normal message -->
-        <template v-else>
-          <span class="text" v-html="msg.text"></span>
-
-          <div v-if="msg.buttons && msg.buttons.length" class="quick-buttons">
-            <div v-for="(btn, i) in msg.buttons" :key="i" class="quick-btn-row">
-              <button class="quick-btn" @click="$emit('send', btn)">
-                {{ btn }}
-              </button>
-            </div>
+  <div class="chat-bg">
+    <div ref="container" class="chat-messages">
+      <div
+        v-for="msg in messages"
+        :key="msg.id"
+        class="message"
+        :class="[msg.from, { typing: msg.typing }]"
+      >
+        <div class="bubble">
+          <div v-if="msg.typing" class="typing-bubble">
+            <span></span><span></span><span></span>
           </div>
 
-          <small class="time">
-            {{ msg.time }}
-            <span v-if="msg.from === 'me'" class="ticks">
-              {{ msg.status === 'read' ? '✔✔' : '✔' }}
-            </span>
-          </small>
-        </template>
+          <template v-else>
+            <span class="text" v-html="msg.text"></span>
 
+            <div v-if="msg.buttons && msg.buttons.length" class="quick-buttons">
+              <div v-for="(btn, i) in msg.buttons" :key="i" class="quick-btn-row">
+                <button class="quick-btn" @click="$emit('send', btn)">
+                  {{ btn }}
+                </button>
+              </div>
+            </div>
+
+            <small class="time">
+              {{ msg.time }}
+              <span v-if="msg.from === 'me'" class="ticks">
+                {{ msg.status === 'read' ? '✔✔' : '✔' }}
+              </span>
+            </small>
+          </template>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, watch, nextTick } from 'vue'
@@ -47,7 +46,7 @@ const props = defineProps({
 
 const container = ref(null)
 
-// scroll to bottom whenever messages change
+// scroll to bottom 
 watch(
   () => props.messages,
   async () => {
@@ -62,23 +61,67 @@ watch(
 
 <style scoped>
 .chat-messages {
+  position: relative;
+  z-index: 2;
   min-height: 0;
   flex: 1;
   overflow-y: auto;
   overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
-  padding: 12px 12px 80px;
-  background: var(--chat-bg);
+  padding: 12px 12px 20px;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+
+  background: transparent;
+
 }
 
+.chat-bg{
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  background-image: var(--chat-wallpaper);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+}
+
+.chat-bg::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-image: var(--chat-wallpaper);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  filter: blur(1px);
+  transform: scale(1.06);
+  z-index: 0;
+}
+
+.chat-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.35);
+  z-index: 1;
+}
 
 /* message row */
 .message {
+  position: relative;
+  z-index: 2;
   display: flex;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
   animation: popIn 0.18s ease-out;
 }
 

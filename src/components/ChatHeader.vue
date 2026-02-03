@@ -1,6 +1,6 @@
 <template>
   <div class="chat-header d-flex align-items-center px-3 shadow-sm">
-    <img src="../assets/image.png" class="avatar" alt="profile-pic" @click="showAvatarModal = true">
+    <img src="../assets/profile-pic.webp" class="avatar" alt="profile-pic" @click="showAvatarModal = true">
 
     <div class="user-info flex-grow-1 ms-2">
       <div class="username" @click="showDetailsModal = true">Shaka Senaji</div>
@@ -19,7 +19,7 @@
     </button>
 
     <div v-if="showAvatarModal" class="modal-overlay" @click.self="showAvatarModal = false">
-      <img src="../assets/image.png" class="modal-avatar" />
+      <img src="../assets/profile-pic.webp" class="modal-avatar" />
     </div>
 
     <div v-if="showDetailsModal" class="modal-overlay" @click.self="showDetailsModal = false">
