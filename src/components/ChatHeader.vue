@@ -24,10 +24,6 @@
 
     <div v-if="showDetailsModal" class="modal-overlay" @click.self="showDetailsModal = false">
       <div class="modal-content">
-        <h3>Shaka Senaji</h3>
-        <p>ICT Officer & Systems Support Specialist</p>
-        <p>Email: <strong>snjishaka@gmail.com</strong></p>
-        <p>Phone: <strong>+254 704 210 555</strong></p>
         <p>The site is still being built, Make sure to check in to see how features are updated.! </p>
       </div>
     </div>

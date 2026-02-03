@@ -56,7 +56,7 @@ const messages = ref(
   savedMessages ? JSON.parse(savedMessages) : [{
     id: Date.now(),
     text: `👋 Hello! Welcome to my portfolio.
-I’m <span class="bold">Shaka Senaji</span>, an ICT Officer & Systems Support Specialist.
+I’m <span class="bold">Shaka</span>, an ICT Officer & Systems Support Specialist.
 Type <span class="bold">'help'</span> to explore....`,
     from: 'bot',
     time: getTime()
@@ -371,7 +371,7 @@ Systems support, networking, databases & web platforms, django, Python`
 'about me': () => pushBot(
 `👋 <span class="bold">About Me</span><br>
 
-I'm <span class="bold">Shaka Senaji</span>, an IT Analyst & Systems Support professional with 4+ years of experience keeping systems reliable, secure, and running smoothly.<br>
+I'm <span class="bold">Shaka</span>, an IT Analyst & Systems Support professional with 4+ years of experience keeping systems reliable, secure, and running smoothly.<br>
 
 I specialize in:<br>
 • ICT support & infrastructure reliability<br>
@@ -386,7 +386,7 @@ I specialize in:<br>
 `📬 <span class="bold">Get in Touch</span><br>
 📧 Email: snjishaka@gmail.com<br>
 📞 Phone: +254 704 210 555<br>
-🌍 Portfolio: <a class="alink" href="https://shakasenaji.vercel.app" target="_blank">shakasenaji.vercel.app</a><br>
+🌍 Portfolio: <a class="alink" href="https://technav.store/" target="_blank">shakasenaji</a><br>
 💻 GitHub: <a class="alink" href="https://github.com/mrrugby" target="_blank">mrrugby</a><br>
 🔗 LinkedIn: <a class="alink" href="https://linkedin.com/in/snji-shaka" target="_blank">snji-shaka</a>`
 ),
