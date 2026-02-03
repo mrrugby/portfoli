@@ -7,8 +7,8 @@
       placeholder="Type a message…"
     />
 
-    <button class="send-btn" type="submit" aria-label="Send" :class="{ typing: isTyping}">
-      
+    <button class="send-btn" type="submit" aria-label="Send">
+      <span class="send-icon" :class="{ typing: isTyping }">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="18"
@@ -23,6 +23,7 @@
         <line x1="22" y1="2" x2="11" y2="13"></line>
         <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
       </svg>
+      </span>
     </button>
   </form>
 </template>
@@ -55,6 +56,7 @@ function submit() {
   background: var(--header-bg);
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   padding-bottom: env(safe-area-inset-bottom);
+  margin-bottom: 5px;
 }
 
 /* input field */
@@ -100,8 +102,11 @@ function submit() {
   transform: scale(0.95);
 }
 
-.send-btn.typing {
+
+.send-icon.typing{
+  display: flex;
   animation: bounce 0.8s infinite;
+  will-change: transform;
 }
 
 @keyframes bounce {
