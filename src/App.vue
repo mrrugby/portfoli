@@ -482,12 +482,14 @@ body, input, textarea, button, * { font-family: var(--font-family); }
 html, body {
   height: 100%;
   margin: 0;
+  overflow: hidden;
 }
 .app{
- height:100svh;
+ height:100dvh;
  background: var(--app-bg);
  display: flex;
  align-items: stretch;
+ width: 100%;
 }
 
 .chat-shell {
@@ -503,7 +505,7 @@ html, body {
 
 @media (min-width: 992px) {
   .chat-shell {
-    height: 90dvh;
+    height: 100%;
     border-radius: 12px;
     overflow: hidden;
   }
