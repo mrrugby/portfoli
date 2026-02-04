@@ -38,6 +38,9 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.visualViewport?.removeEventListener('resize', updateHeight)
   window.removeEventListener('resize', updateHeight)
+  setTimeout(startPresenceRotation, 50)
+  stopPresenceRotation()
+
 })
 
 // -------------------- HELPERS FIRST --------------------
@@ -78,15 +81,50 @@ function playSound() {
 
 // -------------------- HEADER --------------------
 const headerRef = ref(null)
+
+const idleStatuses = [
+  'Online 🟢',
+  'Usually replies within seconds 😂',
+  'Available for new projects 💼'
+]
+
+let idleIndex = 0
 let headerTimeout = null
+let presenceTimer = null
+
+function setIdleStatus() {
+  headerRef.value?.setStatus(idleStatuses[idleIndex])
+  idleIndex = (idleIndex + 1) % idleStatuses.length
+}
+
+function startPresenceRotation() {
+  
+  setIdleStatus()
+
+  
+  clearInterval(presenceTimer)
+  presenceTimer = setInterval(() => {
+    if (!headerTimeout) setIdleStatus()
+  }, 7000)
+}
+
+function stopPresenceRotation() {
+  clearInterval(presenceTimer)
+  presenceTimer = null
+}
+
 function setHeader(text) {
+  
   headerRef.value?.setStatus(text)
+
+ 
   clearTimeout(headerTimeout)
   headerTimeout = setTimeout(() => {
-    const lastSeen = headerRef.value?.getLastSeenText()
-    if (lastSeen) headerRef.value?.setStatus(lastSeen)
+    headerTimeout = null
+    setIdleStatus() 
   }, 4000)
 }
+
 
 // -------------------- MESSAGE HELPERS --------------------
 function pushBot(text, buttons = []) {

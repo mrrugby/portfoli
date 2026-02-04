@@ -1,15 +1,24 @@
 <template>
   <div class="chat-header d-flex align-items-center px-3 shadow-sm">
-    <img src="../assets/profile-pic.webp" class="avatar" alt="profile-pic" @click="showAvatarModal = true">
+    <img
+      src="../assets/profile-pic.webp"
+      class="avatar"
+      alt="profile-pic"
+      @click="showAvatarModal = true"
+    >
 
     <div class="user-info flex-grow-1 ms-2">
       <div class="username" @click="showDetailsModal = true">Shaka Senaji</div>
+
       <div class="status">
-        <span v-if="status === 'typing..'">
+        <!-- Typing animation -->
+        <span v-if="isTyping">
           typing<span class="dots"><span>.</span><span>.</span><span>.</span></span>
         </span>
+
+        <!-- Otherwise show the status text (Online / replies within 1 hour / etc.) -->
         <span v-else>
-          {{ getLastSeen() }}
+          {{ statusText }}
         </span>
       </div>
     </div>
@@ -30,7 +39,57 @@
   </div>
 </template>
 
+<script setup>
+import { ref } from 'vue'
 
+const emit = defineEmits(['toggle-theme'])
+
+function toggleTheme() {
+  emit('toggle-theme')
+}
+
+// Avatar / Details modal
+const showAvatarModal = ref(false)
+const showDetailsModal = ref(false)
+
+// Status state
+const isTyping = ref(false)
+const statusText = ref('Online 🟢')
+
+// Optional: store when we last changed status (if you want “last seen” later)
+let lastSeenAt = null
+
+// Accepts:
+// - "typing..." / "typing.. 🤖" / "typing" -> triggers typing animation
+// - any other string -> shows it as the status text
+function setStatus(value) {
+  const v = String(value || '').toLowerCase()
+
+  // treat any "typing" text as typing
+  if (v.includes('typing')) {
+    isTyping.value = true
+    return
+  }
+
+  isTyping.value = false
+  statusText.value = value
+  lastSeenAt = new Date()
+}
+
+// If you still want to expose last-seen for other uses
+function getLastSeenText() {
+  if (!lastSeenAt) return 'last seen just now'
+  const diff = Math.floor((Date.now() - lastSeenAt.getTime()) / 60000)
+  if (diff < 1) return 'last seen just now'
+  if (diff === 1) return 'last seen 1 minute ago'
+  return `last seen ${diff} minutes ago`
+}
+
+defineExpose({
+  setStatus,
+  getLastSeenText
+})
+</script>
 
 <style scoped>
 .chat-header {
@@ -76,13 +135,8 @@
   animation: blink 1.4s infinite both;
   font-weight: bold;
 }
-
-.dots span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-.dots span:nth-child(3) {
-  animation-delay: 0.4s;
-}
+.dots span:nth-child(2) { animation-delay: 0.2s; }
+.dots span:nth-child(3) { animation-delay: 0.4s; }
 
 @keyframes blink {
   0%, 100% { opacity: 0; }
@@ -141,12 +195,6 @@
   animation: popIn 0.3s ease;
 }
 
-.modal-content a {
-  color: var(--link-color);
-  text-decoration: underline;
-}
-
-/* Animations */
 @keyframes popIn {
   0% { transform: scale(0.5); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
@@ -156,51 +204,4 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
-
 </style>
-
-<script setup>
-import { ref } from 'vue'
-
-const status = ref('Online 🟢')
-let lastSeenAt = null
-
-const emit = defineEmits(['toggle-theme'])
-
-function toggleTheme() {
-  emit('toggle-theme')
-}
-
-// Avatar / Details modal
-const showAvatarModal = ref(false)
-const showDetailsModal = ref(false)
-
-// Update status or record last seen
-function setStatus(value) {
-  if (value === 'typing') {
-    status.value = 'typing'
-  } else {
-    status.value = value
-    lastSeenAt = new Date()
-  }
-}
-
-// Compute last seen text
-function getLastSeen() {
-  if (!lastSeenAt) return 'last seen just now'
-
-  const diff = Math.floor((Date.now() - lastSeenAt.getTime()) / 60000)
-  if (diff < 1) return 'last seen just now'
-  if (diff === 1) return 'last seen 1 minute ago'
-  return `last seen ${diff} minutes ago`
-}
-
-defineExpose({
-  setStatus,
-  getLastSeen
-})
-</script>
-
-
-
