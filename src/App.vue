@@ -18,6 +18,9 @@ import ChatMessages from './components/ChatMessages.vue'
 import ChatInput from './components/ChatInput.vue'
 import sentSound from './assets/sentmessage.mp3'
 
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xaqbrvqk";
+
+// -------------------- HEIGHT (mobile keyboard) --------------------
 const appHeight = ref(window.innerHeight)
 
 function updateHeight() {
@@ -37,9 +40,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', updateHeight)
 })
 
-
-
-// -------------------- HELPERS FIRST (avoid hoist bugs) --------------------
+// -------------------- HELPERS FIRST --------------------
 function getTime() {
   const d = new Date()
   return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`
@@ -132,183 +133,55 @@ function stopFlow() {
 // -------------------- INTENT DETECTION --------------------
 function detectIntent(input) {
   const msg = input.toLowerCase()
-
-  if (msg.includes('website') || msg.includes('portfolio') || msg.includes('site'))
-    return 'website'
-
-  if (msg.includes('hire'))
-    return 'hire'
-
+  if (msg.includes('website') || msg.includes('portfolio') || msg.includes('site')) return 'website'
+  if (msg.includes('hire')) return 'hire'
   return null
 }
 
-// -------------------- FLOWS --------------------
-function handleFlow(input) {
-  const flow = activeFlow.value
-  if (!flow) return false
-
-  const step = flow.step
-  const data = flow.data
-  const msg = input.trim()
-
-  
-  if (['help','clear','cancel'].includes(msg.toLowerCase())) {
-    stopFlow()
-    commands[msg.toLowerCase()]()
-    return true
+// -------------------- SUBMIT TO EMAIL --------------------
+async function submitLeadToEmail(payload) {
+  try {
+    const res = await fetch(FORMSPREE_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+    return res.ok
+  } catch (err) {
+    return false
   }
-
-  // ---------------- HIRE FLOW ----------------
-  if (flow.type === 'hire') {
-
-    // Step 1: Name
-    if (step === 'name') {
-      if (!/^[a-zA-Z ]{2,}$/.test(msg)) {
-        pushBot('❌ Please enter a valid name (letters only, min 2 characters).')
-        return true
-      }
-      data.name = msg
-      flow.step = 'contact'
-      pushBot(`✍️ Thanks ${data.name}! Please enter your email or phone.`)
-      return true
-    }
-
-    // Step 2: Contact
-    if (step === 'contact') {
-      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(msg)
-      const isPhone = /^[0-9+]{6,15}$/.test(msg)
-      if (!isEmail && !isPhone) {
-        pushBot('❌ Please enter a valid email or phone number.')
-        return true
-      }
-      data.contact = msg
-      flow.step = 'confirm'
-      pushBot(`✅ Confirm:<br>
-        <strong>Name:</strong> ${data.name}
-        <strong>Contact:</strong> ${data.contact}<br>
-        Type <strong>yes</strong> to confirm.`)
-      return true
-    }
-
-    // Step 3: Confirm
-    if (step === 'confirm') {
-      stopFlow()
-      if (msg.toLowerCase() === 'yes') {
-        pushBot(`🚀 Great! I’ll reach out soon.`)
-      } else {
-        pushBot(`❌ Cancelled.`)
-      }
-      return true
-    }
-  }
-
-  // ---------------- WEBSITE FLOW ----------------
-  if (flow.type === 'website') {
-
-    // Step 1: Name
-    if (step === 'name') {
-      if (!/^[a-zA-Z ]{2,}$/.test(msg)) {
-        pushBot('❌ Please enter a valid name (letters only).')
-        return true
-      }
-      data.name = msg
-      flow.step = 'type'
-      pushBot(`🌐 Hi ${data.name}! What type of website?<br>Portfolio • Business • E-commerce • Other`)
-      return true
-    }
-
-    // Step 2: Type
-    if (step === 'type') {
-      const val = msg.toLowerCase()
-      const allowed = ['portfolio', 'business', 'e-commerce', 'other']
-      if (!allowed.includes(val)) {
-        pushBot('❌ Please choose one: Portfolio, Business, E-commerce, Other.')
-        return true
-      }
-      data.type = val
-      flow.step = 'budget'
-      pushBot(`💰 What’s your budget range(Ksh)? (e.g., 500 or 500-1000)`)
-      return true
-    }
-
-    // Step 3: Budget
-    if (step === 'budget') {
-      if (!/^\d+(-\d+)?$/.test(msg)) {
-        pushBot('❌ Please enter a valid budget (number or range, e.g., 500 or 500-1000).')
-        return true
-      }
-      data.budget = msg
-      flow.step = 'contact'
-      pushBot(`📬 How can I contact you? (Email or phone)`)
-      return true
-    }
-
-    // Step 4: Contact
-    if (step === 'contact') {
-      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(msg)
-      const isPhone = /^[0-9+]{6,15}$/.test(msg)
-      if (!isEmail && !isPhone) {
-        pushBot('❌ Please enter a valid email or phone number.')
-        return true
-      }
-      data.contact = msg
-      flow.step = 'confirm'
-      pushBot(`✅ Confirm:<br>
-<strong>Name:</strong> ${data.name}
-<strong>Website:</strong> ${data.type}
-<strong>Budget:</strong> ${data.budget}
-<strong>Contact:</strong> ${data.contact}<br>
-Type <strong>yes</strong> to confirm.`)
-      return true
-    }
-
-    // Step 5: Confirm
-    if (step === 'confirm') {
-      stopFlow()
-      if (msg.toLowerCase() === 'yes') {
-        pushBot(`🚀 Great! I’ll reach out soon.`)
-      } else {
-        pushBot(`❌ Cancelled.`)
-      }
-      return true
-    }
-  }
-
-  return true
 }
-
-
 
 // -------------------- COMMAND MAP --------------------
 const commands = {
   help: () => pushBot(
-  `🧭 <span class="bold">What would you like to explore?</span>`,
-  [
-    'About Me',
-    'Website Build',
-    'My Experience',
-    'Skills',
-    'Education',
-    'Hire Me',
-    'My Contacts',
-    'Clear Chat'
-  ]
-),
-
-
+    `🧭 <span class="bold">What would you like to explore?</span>`,
+    [
+      'About Me',
+      'Website Build',
+      'My Experience',
+      'Skills',
+      'Education',
+      'Hire Me',
+      'My Contacts',
+      'Clear Chat'
+    ]
+  ),
 
   clear: () => {
-  messages.value = []
-  pushBot(
-    `👋 Nice to see you again! What would you like?`,
-    [
-      'Hire Me',
-      'Help',
-      'My Contacts'
-    ]
-  )
-},
-
+    messages.value = []
+    pushBot(
+      `👋 Nice to see you again! What would you like?`,
+      [
+        'Hire Me',
+        'Help',
+        'My Contacts'
+      ]
+    )
+  },
 
   'my experience': () => pushBot(
 `💼 <span class="bold">Professional Experience</span><br>
@@ -330,7 +203,7 @@ const commands = {
 <span class="bold">Earlier Roles</span><br>
 • ICT Technician – Noip Agency<br>
 • ICT Technician – Dove Adventures`
-),
+  ),
 
   skills: () => pushBot(
 `🛠️ <span class="bold">Technical Skills</span><br>
@@ -344,7 +217,7 @@ const commands = {
 <span class="bold">Networking</span><br>
 • LAN/WAN & Wi-Fi setup<br>
 • VPNs, routers, switches & firewalls<br>
-• Network diagnostics & troubleshooting<br>
+• Network diagnostics & troubleshooting<br><br>
 
 <span class="bold">Databases & Systems</span><br>
 • MySQL & MongoDB<br>
@@ -355,7 +228,7 @@ const commands = {
 • Python (Django), HTML, CSS<br>
 • Git & GitHub<br>
 • VS Code, CLI, cPanel`
-),
+  ),
 
   education: () => pushBot(
 `🎓 <span class="bold">Education & Certifications</span><br>
@@ -366,21 +239,19 @@ const commands = {
 
 <span class="bold">Focus:</span><br>
 Systems support, networking, databases & web platforms, django, Python`
-),
+  ),
 
-'about me': () => pushBot(
+  'about me': () => pushBot(
 `👋 <span class="bold">About Me</span><br>
 
-I'm <span class="bold">Shaka</span>, an IT Analyst & Systems Support professional with 4+ years of experience keeping systems reliable, secure, and running smoothly.<br>
+I'm <span class="bold">Shaka</span>, an IT Analyst & Systems Support professional with 4+ years of experience keeping systems reliable, secure, and running smoothly.<br><br>
 
 I specialize in:<br>
 • ICT support & infrastructure reliability<br>
 • Network & system troubleshooting<br>
 • User support & access control<br>
 • Building practical web systems that solve real problems`
-),
-
-
+  ),
 
   'my contacts': () => pushBot(
 `📬 <span class="bold">Get in Touch</span><br>
@@ -389,10 +260,178 @@ I specialize in:<br>
 🌍 Portfolio: <a class="alink" href="https://technav.store/" target="_blank">shakasenaji</a><br>
 💻 GitHub: <a class="alink" href="https://github.com/mrrugby" target="_blank">mrrugby</a><br>
 🔗 LinkedIn: <a class="alink" href="https://linkedin.com/in/snji-shaka" target="_blank">snji-shaka</a>`
-),
-
+  ),
 
   cancel: () => pushBot('❌ Process cancelled.')
+}
+
+// -------------------- FLOWS --------------------
+async function handleFlow(input) {
+  const flow = activeFlow.value
+  if (!flow) return false
+
+  const step = flow.step
+  const data = flow.data
+  const msg = input.trim()
+  const lower = msg.toLowerCase()
+
+  if (['help', 'clear', 'cancel'].includes(lower)) {
+    stopFlow()
+    commands[lower]()
+    return true
+  }
+
+  // ---------------- HIRE FLOW ----------------
+  if (flow.type === 'hire') {
+    if (step === 'name') {
+      if (!/^[a-zA-Z ]{2,}$/.test(msg)) {
+        pushBot('❌ Please enter a valid name (letters only, min 2 characters).')
+        return true
+      }
+      data.name = msg
+      flow.step = 'contact'
+      pushBot(`✍️ Thanks ${data.name}! Please enter your email or phone.`)
+      return true
+    }
+
+    if (step === 'contact') {
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(msg)
+      const isPhone = /^[0-9+]{6,15}$/.test(msg)
+      if (!isEmail && !isPhone) {
+        pushBot('❌ Please enter a valid email or phone number.')
+        return true
+      }
+      data.contact = msg
+      flow.step = 'confirm'
+      pushBot(`✅ Confirm:<br>
+<strong>Name:</strong> ${data.name}<br>
+<strong>Contact:</strong> ${data.contact}<br>
+Type <strong>yes</strong> to confirm.`)
+      return true
+    }
+
+    if (step === 'confirm') {
+      stopFlow()
+
+      if (lower === 'yes') {
+        setHeader("sending... 📩")
+        addTyping()
+
+        const ok = await submitLeadToEmail({
+          source: "Portfolio Chat",
+          type: "Hire Me",
+          name: data.name,
+          contact: data.contact,
+          createdAt: new Date().toISOString(),
+        })
+
+        removeTyping()
+
+        if (ok) {
+          pushBot(`✅ Sent! Thanks ${data.name}. I’ll reach out shortly.`)
+        } else {
+          pushBot(`⚠️ I couldn’t send that right now. Please use: <span class="bold">snjishaka@gmail.com</span>`)
+        }
+
+        setHeader("Online 🟢")
+        return true // ✅ IMPORTANT
+      }
+
+      pushBot(`❌ Cancelled.`)
+      return true
+    }
+  }
+
+  // ---------------- WEBSITE FLOW ----------------
+  if (flow.type === 'website') {
+    if (step === 'name') {
+      if (!/^[a-zA-Z ]{2,}$/.test(msg)) {
+        pushBot('❌ Please enter a valid name (letters only).')
+        return true
+      }
+      data.name = msg
+      flow.step = 'type'
+      pushBot(`🌐 Hi ${data.name}! What type of website?<br>Portfolio • Business • E-commerce • Other`)
+      return true
+    }
+
+    if (step === 'type') {
+      const val = lower
+      const allowed = ['portfolio', 'business', 'e-commerce', 'other']
+      if (!allowed.includes(val)) {
+        pushBot('❌ Please choose one: Portfolio, Business, E-commerce, Other.')
+        return true
+      }
+      data.type = val
+      flow.step = 'budget'
+      pushBot(`💰 What’s your budget range (Ksh)? (e.g., 500 or 500-1000)`)
+      return true
+    }
+
+    if (step === 'budget') {
+      if (!/^\d+(-\d+)?$/.test(msg)) {
+        pushBot('❌ Please enter a valid budget (number or range, e.g., 500 or 500-1000).')
+        return true
+      }
+      data.budget = msg
+      flow.step = 'contact'
+      pushBot(`📬 How can I contact you? (Email or phone)`)
+      return true
+    }
+
+    if (step === 'contact') {
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(msg)
+      const isPhone = /^[0-9+]{6,15}$/.test(msg)
+      if (!isEmail && !isPhone) {
+        pushBot('❌ Please enter a valid email or phone number.')
+        return true
+      }
+      data.contact = msg
+      flow.step = 'confirm'
+      pushBot(`✅ Confirm:<br>
+<strong>Name:</strong> ${data.name}<br>
+<strong>Website:</strong> ${data.type}<br>
+<strong>Budget:</strong> ${data.budget}<br>
+<strong>Contact:</strong> ${data.contact}<br>
+Type <strong>yes</strong> to confirm.`)
+      return true
+    }
+
+    if (step === 'confirm') {
+      stopFlow()
+
+      if (lower === 'yes') {
+        setHeader("sending... 📩")
+        addTyping()
+
+        const ok = await submitLeadToEmail({
+          source: "Portfolio Chat",
+          type: "Website Request",
+          name: data.name,
+          websiteType: data.type,
+          budget: data.budget,
+          contact: data.contact,
+          createdAt: new Date().toISOString(),
+        })
+
+        removeTyping()
+
+        if (ok) {
+          pushBot(`✅ Sent! Thanks ${data.name}. I’ll reach out shortly.`)
+        } else {
+          pushBot(`⚠️ I couldn’t send that right now. Please email: <span class="bold">snjishaka@gmail.com</span>`)
+        }
+
+        setHeader("Online 🟢")
+        return true // ✅ IMPORTANT
+      }
+
+      pushBot(`❌ Cancelled.`)
+      return true
+    }
+  }
+
+  return true
 }
 
 // -------------------- MAIN RESPONDER --------------------
@@ -400,71 +439,71 @@ function sendMessage(text) {
   pushUser(text)
   setHeader('typing... 🤖')
   addTyping()
-
   setTimeout(() => respond(text), 600)
 }
 
-function respond(input) {
+async function respond(input) {
   removeTyping()
 
-   // mark last user message as read
+  // mark last user message as read
   const lastUserMsg = [...messages.value].reverse().find(m => m.from === 'me')
   if (lastUserMsg) lastUserMsg.status = 'read'
 
-
   const key = input.toLowerCase().trim()
 
-
-
-  // Handle active flow
-  if (handleFlow(input)) return setHeader('Online 🟢')
+  // ✅ handle active flow ONCE
+  const handled = await handleFlow(input)
+  if (handled) {
+    setHeader('Online 🟢')
+    return
+  }
 
   // Detect intent to start flows
   const intent = detectIntent(key)
   if (intent) {
     startFlow(intent)
-    return pushBot(`👋 Let’s begin. What’s your full name?`)
+    pushBot(`👋 Let’s begin. What’s your full name?`)
+    setHeader('Online 🟢')
+    return
   }
 
-  // commands
+  // Commands / quick map
   const map = {
-  'hire me': () => {
-    startFlow('hire')
-    pushBot(`👋 Great! What’s your full name?`)
-  },
+    'hire me': () => {
+      startFlow('hire')
+      pushBot(`👋 Great! What’s your full name?`)
+    },
 
-  'build me a website': () => {
-    startFlow('website')
-    pushBot(`🌐 Nice! What’s your full name?`)
-  },
+    'build me a website': () => {
+      startFlow('website')
+      pushBot(`🌐 Nice! What’s your full name?`)
+    },
 
-  'my experience': commands.experience,
-  'my skills': commands.skills,
-  'education': commands.education,
-  'contact': commands.contact,
-  'clear chat': commands.clear
-}
+    'my experience': commands['my experience'],
+    'my skills': commands.skills,
+    'skills': commands.skills,
+    'education': commands.education,
+    'about me': commands['about me'],
+    'my contacts': commands['my contacts'],
+    'help': commands.help,
+    'clear': commands.clear,
+    'clear chat': commands.clear,
+    'cancel': commands.cancel,
+  }
 
-if (map[key]) return map[key]()
+  if (map[key]) {
+    map[key]()
+    setHeader('Online 🟢')
+    return
+  }
 
-if (commands[key]) {
-  commands[key]()
-  return setHeader('Online 🟢')
-}
-
-// -------------------- DEFAULT FALLBACK --------------------
-pushBot(
-  `🤔 I didn’t quite understand that.<br><br>
-   Type <span class="bold">'help'</span> to get started.`,
-  [
-    'Hire Me',
-    'Help'
-  ]
-)
-
-return setHeader('Online 🟢')
-
-  
+  // DEFAULT FALLBACK
+  pushBot(
+    `🤔 I didn’t quite understand that.<br><br>
+Type <span class="bold">'help'</span> to get started.`,
+    ['Hire Me', 'Help']
+  )
+  setHeader('Online 🟢')
 }
 
 // -------------------- THEME --------------------
@@ -474,6 +513,7 @@ function toggleTheme() {
   localStorage.setItem('chat_theme', theme.value)
 }
 </script>
+
 
 
 <style>
